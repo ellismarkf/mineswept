@@ -1,11 +1,11 @@
-export const buildBoard = (tile, size = 9, random = true) =>
+const buildBoard = (tile, size = 9, random = true) =>
   [ ...Array(size) ].map( (row, y) =>
     [ ...Array(size) ].map( (col, x) =>
       tile(x, y, random)
     )
   )
 
-export const tile = (x, y, random = true) =>
+const tile = (x, y, random = true) =>
   Object.assign({}, {
     hasMine: random ? Math.random() > .5 : false,
     swept: false,
@@ -16,7 +16,7 @@ export const tile = (x, y, random = true) =>
 
 const directions = [ 'N', 'NW', 'W', 'SW', 'S', 'SE', 'E', 'NE' ]
 
-export const perimeterCoords = tile => {
+const perimeterCoords = tile => {
   const { x, y } = tile
   return Object.assign({}, {
     'N' : { x       , y: y - 1 },
@@ -30,7 +30,7 @@ export const perimeterCoords = tile => {
   })
 }
 
-export const getPerimeter = (tile, board) => {
+const getPerimeter = (tile, board) => {
   const perimeter = perimeterCoords(tile)
   return directions
     .map( direction => {
@@ -42,11 +42,21 @@ export const getPerimeter = (tile, board) => {
     .filter( tile => tile !== undefined )
 }
 
-export const getThreatCount = perimeter =>
+const getThreatCount = perimeter =>
   perimeter.reduce((threats, tile) => {
     tile.hasMine ? threats += 1 : threats
   }, 0)
 
-export const sweep = tile => {
+const sweep = tile => {
 
+}
+
+module.exports = {
+  buildBoard: buildBoard,
+  tile: tile,
+  perimeterCoords: perimeterCoords,
+  getPerimeter: getPerimeter,
+  getThreatCount: getThreatCount,
+  sweep: sweep,
+  directions: directions
 }
