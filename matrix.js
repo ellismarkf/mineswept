@@ -35,7 +35,7 @@ const getPerimeter = (tile, board) => {
   return directions
     .map( direction => {
       const { x, y } = perimeter[direction]
-      const invalidX = x < 0 || x > board[0].length
+      const invalidX = x < 0 || x > board[0].length - 1
       const invalidY = y < 0 || y > board.length
       return invalidX || invalidY ? undefined : board[x][y]
     })
