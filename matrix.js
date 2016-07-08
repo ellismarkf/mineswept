@@ -11,13 +11,13 @@ const generateTiles = (tile, rows = 9, cols = 9, mines = 10) =>
   .concat([...Array(rows * cols - mines)].map( t => tile()))
   .sort(() => Math.random() - 0.5)
   .map( (tile, index, tiles) => {
-    const perimeter = newGetPerimeter(index, tiles, cols)
+    const perimeter = getPerimeter(index, tiles, cols)
     return Object.assign(tile, {
       threatCount: getThreatCount(perimeter)
     })
   })
 
-const newTile = (hasMine = false, threatCount = 0) =>
+const buildTile = (hasMine = false, threatCount = 0) =>
   Object.assign({}, {
     hasMine,
     swept: false,
@@ -27,7 +27,7 @@ const newTile = (hasMine = false, threatCount = 0) =>
 
 const directions = [ 'N', 'NW', 'W', 'SW', 'S', 'SE', 'E', 'NE' ]
 
-const newPerimeterCoords = (tileIndex, cols) =>
+const perimeterCoords = (tileIndex, cols) =>
   Object.assign({}, {
     'N' : tileIndex - cols,
     'NW': tileIndex - (cols + 1),
@@ -39,8 +39,8 @@ const newPerimeterCoords = (tileIndex, cols) =>
     'NE': tileIndex - (cols - 1)  
   })
 
-const newGetPerimeter = (tileIndex, tiles, cols) => {
-  const perimeter = newPerimeterCoords(tileIndex, cols)
+const getPerimeter = (tileIndex, tiles, cols) => {
+  const perimeter = perimeterCoords(tileIndex, cols)
   return directions
     .map( direction => {
       const pIndex = perimeter[direction]
@@ -64,23 +64,22 @@ const getThreatCount = perimeter =>
     return tile.hasMine ? threats += 1 : threats
   }, 0)
 
-const sweep = (tile, board) => {
-  /* end game if tile.hasMine */
+const sweep = (tile, tiles, cols) => {
   /* set tile.swept = true  */
-  const perimeter = getPerimeter(tile, board);
-  const threats = getThreatCount(perimeter);
+  /* end game if tile.hasMine */
+  const perimeter = getPerimeter(tile, tiles, cols);
   perimeter.forEach( tile => {
-    if (!tile.swept && !tile.hasMine) {
-      sweep(tile, board)
+    if (!tile.swept && tile.threatCount > 0) {
+      sweep(tile, tiles, cols)
     }
   })
 }
 
 module.exports = {
   generateTiles: generateTiles,
-  newTile: newTile,
-  newGetPerimeter: newGetPerimeter,
-  newPerimeterCoords: newPerimeterCoords,
+  buildTile: buildTile,
+  getPerimeter: getPerimeter,
+  perimeterCoords: perimeterCoords,
   getThreatCount: getThreatCount,
   sweep: sweep,
   directions: directions
