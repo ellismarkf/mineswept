@@ -62,11 +62,9 @@ describe('game board', function() {
 });
 
 describe('game board with set number of mines', function() {
-  it('should return an shuffled array of {row * columns} items', function() {
-    var flattenedBoard = generateTiles(newTile);
-    var mines = flattenedBoard.filter(tile => tile.hasMine);
-    expect(flattenedBoard.length).to.equal(81);
-    expect(mines.length).to.equal(10);
+  it('should return an shuffled array of 81 tiles for a 9x9 board', function() {
+    var tiles = generateTiles(newTile);
+    expect(tiles.length).to.equal(81);
   });
 });
 
