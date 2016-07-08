@@ -44,7 +44,7 @@ const getPerimeter = (tile, board) => {
 
 const getThreatCount = perimeter =>
   perimeter.reduce((threats, tile) => {
-    tile.hasMine ? threats += 1 : threats
+    return tile.hasMine ? threats += 1 : threats
   }, 0)
 
 const sweep = tile => {

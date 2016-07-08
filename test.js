@@ -34,4 +34,25 @@ describe('game board', function() {
     var edgePerimeter = getPerimeter(edgeTile, board);
     expect(edgePerimeter.length).to.equal(5);
   });
+
+  it('for any given tile, should return the number of neighboring tiles containing mines', function() {
+    var board = [
+      [{x: 0, y: 0, hasMine: true},  {x: 1, y: 0, hasMine: true},  {x: 2, y: 0, hasMine: false}],
+      [{x: 0, y: 1, hasMine: false}, {x: 1, y: 1, hasMine: false}, {x: 2, y: 1, hasMine: true} ],
+      [{x: 0, y: 2, hasMine: false}, {x: 1, y: 2, hasMine: true},  {x: 2, y: 2, hasMine: true} ]
+    ];
+    var oneMineBoard = [
+      [{x: 0, y: 0, hasMine: true},  {x: 1, y: 0, hasMine: false},  {x: 2, y: 0, hasMine: false} ],
+      [{x: 0, y: 1, hasMine: false}, {x: 1, y: 1, hasMine: false}, {x: 2, y: 1, hasMine: false}  ],
+      [{x: 0, y: 2, hasMine: false}, {x: 1, y: 2, hasMine: false},  {x: 2, y: 2, hasMine: false} ]
+    ];
+    var perimeter = getPerimeter(board[1][1], board);
+    var sMP = getPerimeter(oneMineBoard[1][1], oneMineBoard);
+
+    var threats = getThreatCount(perimeter);
+    var sMT = getThreatCount(sMP);
+
+    expect(threats).to.equal(5);
+    expect(sMT).to.equal(1);
+  });
 });
