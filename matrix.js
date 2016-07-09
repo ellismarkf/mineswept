@@ -53,7 +53,7 @@ const getPerimeter = (tileIndex, tiles, cols) => {
 }
 
 const checkWestPerimeter = (t, c, pI) =>
-  t % c === 0 && ((pI === (t - 1)) || (pI === (t + (c - 1))) || (pI === (t - (c + 1))))
+  t % c === 0 && (pI === (t - 1) || pI === (t + (c - 1)) || pI === (t - (c + 1)))
 
 const checkEastPerimeter = (t, c, pI) =>
   (t + 1) % c === 0 && (pI === (t + 1) || pI === (t - (c - 1)) || pI === (t + (c + 1)))
