@@ -125,27 +125,45 @@ describe('sweep', function() {
       {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: true,  threatCount: 1},
       {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}
     ];
-
-    var testResult = [
-
-    ];
-
     var expectedRevealed = sweptTiles.filter( function(tile) { return tile.swept }).length;
 
     var updatedBoard = sweep(12, tiles, 5);
-    console.log(updatedBoard)
-
     var actualRevealed = updatedBoard.filter( function(tile) { return tile.swept }).length;
 
     expect(actualRevealed).to.equal(expectedRevealed);
   });
-});
 
-describe('reveal', function(){
-  xit('should return a new array of tiles with the given tile\'s swept property set to true', function() {
-    var tiles = generateTiles(buildTile);
-    var updatedBoard = reveal(40, tiles, 9);
-    var sweptTile = updatedBoard[40];
-    expect(sweptTile.swept).to.be.true;
+  it('should recursively sweep perimeters of default size board correctly', function() {
+    var tiles = [
+      {hasMine: true,  swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: true,  swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0},
+      {hasMine: false, swept: false, threatCount: 2}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0},
+      {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1},
+      {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 0},
+      {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: false, swept: false, threatCount: 2},
+      {hasMine: true,  swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 0},
+      {hasMine: true,  swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1},
+      {hasMine: false, swept: false, threatCount: 3}, {hasMine: false, swept: false, threatCount: 3}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0},
+      {hasMine: true,  swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}
+    ];
+
+    var sweptTiles = [
+      {hasMine: true,  swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: true,  swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0},
+      {hasMine: false, swept: true,  threatCount: 2}, {hasMine: false, swept: true,  threatCount: 2}, {hasMine: false, swept: true,  threatCount: 2}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0},
+      {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1},
+      {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: true,  swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 0},
+      {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: true,  threatCount: 2}, {hasMine: false, swept: false, threatCount: 2},
+      {hasMine: true,  swept: false, threatCount: 1}, {hasMine: false, swept: true,  threatCount: 2}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: true,  swept: false, threatCount: 0},
+      {hasMine: true,  swept: false, threatCount: 1}, {hasMine: false, swept: true,  threatCount: 2}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: true,  threatCount: 1},
+      {hasMine: false, swept: false, threatCount: 3}, {hasMine: false, swept: true,  threatCount: 3}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0},
+      {hasMine: true,  swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 1}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}
+    ];
+    var expectedRevealed = sweptTiles.filter( function(tile) { return tile.swept }).length;
+
+
+    var updatedBoard = sweep(29, tiles, 9);
+    var actualRevealed = updatedBoard.filter( function(tile) { return tile.swept }).length;
+
+    expect(actualRevealed).to.equal(expectedRevealed);
   });
+
 });
