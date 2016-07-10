@@ -91,12 +91,12 @@ describe('isSafe', function() {
 
   it('should return true when all tiles without mines have been swept', function() {
     var tiles = [
-      { swept: true, hasMine: false},
-      { swept: true, hasMine: false},
-      { swept: false, hasMine: true},
-      { swept: true, hasMine: false}
+      { swept: true,  hasMine: false },
+      { swept: true,  hasMine: false },
+      { swept: false, hasMine: true  },
+      { swept: true,  hasMine: false }
     ]
-    expect(isSafe(tiles)).to.be.false;
+    expect(isSafe(tiles)).to.be.true;
   });
 
   it('should return false when a tile with a mine has been swept (9x9)', function() {

@@ -87,7 +87,7 @@ const sweep = (tileIndex, tiles, cols) => {
 
 const isSafe = tiles =>
   tiles.reduce( (safe, tile) => {
-    return safe && (!tile.swept  || tile.swept && tile.hasMine) 
+    return safe && (!tile.swept  || tile.swept && !tile.hasMine)
   }, true)
 
 module.exports = {
