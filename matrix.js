@@ -12,7 +12,7 @@ const generateTiles = (tile, rows = 9, cols = 9, mines = 10) =>
   .sort(() => Math.random() - 0.5)
   .map( (tile, index, tiles) => {
     const perimeter = getPerimeter(index, tiles, cols)
-    return Object.assign(tile, {
+    return Object.assign({}, tile, {
       threatCount: getThreatCount(perimeter)
     })
   })
@@ -47,16 +47,22 @@ const getPerimeter = (tileIndex, tiles, cols) => {
       const invalidW = checkWestPerimeter(tileIndex, cols, pIndex)
       const invalidE = checkEastPerimeter(tileIndex, cols, pIndex)
       const invalidY = pIndex < 0 || pIndex >= tiles.length
-      return invalidW || invalidE || invalidY ? null : tiles[pIndex]
+      
+      return invalidW || invalidE || invalidY ? null :
+        Object.assign({}, tiles[pIndex], {
+          key: pIndex
+      })
     })
     .filter( tile => tile !== null )
 }
 
 const checkWestPerimeter = (t, c, pI) =>
-  t % c === 0 && (pI === (t - 1) || pI === (t + (c - 1)) || pI === (t - (c + 1)))
+  t % c === 0 &&
+    (pI === (t - 1) || pI === (t + (c - 1)) || pI === (t - (c + 1)))
 
 const checkEastPerimeter = (t, c, pI) =>
-  (t + 1) % c === 0 && (pI === (t + 1) || pI === (t - (c - 1)) || pI === (t + (c + 1)))
+  (t + 1) % c === 0 &&
+    (pI === (t + 1) || pI === (t - (c - 1)) || pI === (t + (c + 1)))
 
 
 const getThreatCount = perimeter =>
@@ -64,23 +70,51 @@ const getThreatCount = perimeter =>
     return tile.hasMine ? threats += 1 : threats
   }, 0)
 
-const sweep = (tile, tiles, cols) => {
-  /* set tile.swept = true  */
-  /* end game if tile.hasMine */
-  const perimeter = getPerimeter(tile, tiles, cols);
-  perimeter.forEach( tile => {
-    if (!tile.swept && tile.threatCount > 0) {
-      sweep(tile, tiles, cols)
-    }
-  })
+const sweep = (tileIndex, tiles, cols) => {
+  const tile = tiles[tileIndex]
+  if (tile.hasMine) return tiles;
+  const sweptTile = Object.assign({}, tile, { swept: true })
+  const updatedBoard = tiles.map( (tile, index) =>
+    index === tileIndex ? sweptTile : tile
+  )
+  const perimeter = getPerimeter(tileIndex, updatedBoard, cols);
+  const sweptBoard = perimeter.reduce( (board, tile) => {
+    return !tile.swept && tile.threatCount === 0 ?
+      sweep(tile.key, board, cols) :
+      board
+    }, updatedBoard)
+  // if (updatedBoard[tileIndex].threatCount === 0) {
+  //   return perimeter.reduce( (board, tile) => {
+  //     return !tile.swept ?
+  //       sweep(tile.key, board, cols) :
+  //       board
+  //     }, updatedBoard)
+  // }
+  return sweptBoard
 }
 
+const reveal = (tileIndex, tiles, cols) => {
+  const tile = tiles[tileIndex]
+  const sweptTile = Object.assign({}, tile, { swept: true })
+  const updatedBoard = tiles.map( (tile, index) =>
+    index === tileIndex ? sweptTile : tile
+  )
+  return sweptTile.hasMine ? updatedBoard : sweep(tileIndex, updatedBoard, cols)
+}
+
+const isSafe = tiles =>
+  tiles.reduce( (safe, tile) => {
+    return safe && (!tile.swept  || tile.swept && tile.hasMine) 
+  }, true)
+
 module.exports = {
-  generateTiles: generateTiles,
-  buildTile: buildTile,
-  getPerimeter: getPerimeter,
-  perimeterCoords: perimeterCoords,
-  getThreatCount: getThreatCount,
-  sweep: sweep,
-  directions: directions
+  generateTiles,
+  buildTile,
+  getPerimeter,
+  perimeterCoords,
+  getThreatCount,
+  sweep,
+  reveal,
+  isSafe,
+  directions
 }

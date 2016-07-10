@@ -5,12 +5,14 @@ var getPerimeter = require('./matrix').getPerimeter;
 var perimeterCoords = require('./matrix').perimeterCoords;
 var getThreatCount = require('./matrix').getThreatCount;
 var sweep = require('./matrix').sweep;
+var reveal = require('./matrix').reveal;
+var isSafe = require('./matrix').isSafe;
 var directions = require('./matrix').directions;
 
 describe('game board with set number of mines', function() {
-  it('should return an shuffled array of 81 tiles for a 9x9 board', function() {
-    var tiles = generateTiles(buildTile);
-    expect(tiles.length).to.equal(81);
+  it('should return a shuffled array of 81 tiles for a 9x9 board', function() {
+    var tiles = generateTiles(buildTile, 16, 16, 40);
+    expect(tiles.length).to.equal(16 * 16);
   });
 });
 
@@ -68,5 +70,51 @@ describe('getPerimeter', function() {
     var tiles = generateTiles(buildTile);
     var sePerimeter = getPerimeter(23, tiles, 9);
     expect(sePerimeter.length).to.equal(8);
+  });
+});
+
+describe('isSafe', function() {
+  it('should return true before players reveals first mine', function() {
+    var tiles = generateTiles(buildTile);
+    var safe = isSafe(tiles);
+    expect(safe).to.be.true;
+  });
+
+  it('should return false when a tile with a mine is swept', function() {
+    var tiles = [
+      { swept: true, hasMine: false},
+      { swept: true, hasMine: false},
+      { swept: false, hasMine: false},
+      { swept: true, hasMine: true}
+    ]
+    expect(isSafe(tiles)).to.be.false;
+  });
+
+  it('should return true when all tiles without mines have been swept', function() {
+    var tiles = [
+      { swept: true, hasMine: false},
+      { swept: true, hasMine: false},
+      { swept: false, hasMine: true},
+      { swept: true, hasMine: false}
+    ]
+    expect(isSafe(tiles)).to.be.false;
+  });
+});
+
+describe('sweep', function() {
+  it('should return a new arry of tiles after recursively sweeping perimeters', function() {
+    var tiles = generateTiles(buildTile);
+    tiles[40] = Object.assign({}, tiles[40], { swept: true });
+    var updatedBoard = sweep(40, tiles, 9);
+    expect(updatedBoard.length).to.equal(81);
+  });
+});
+
+describe('reveal', function(){
+  it('should return a new array of tiles with the given tile\'s swept property set to true', function() {
+    var tiles = generateTiles(buildTile);
+    var updatedBoard = reveal(40, tiles, 9);
+    var sweptTile = updatedBoard[40];
+    expect(sweptTile.swept).to.be.true;
   });
 });
