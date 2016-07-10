@@ -9,6 +9,10 @@ var reveal = require('./matrix').reveal;
 var isSafe = require('./matrix').isSafe;
 var directions = require('./matrix').directions;
 
+var getPerimeterPositions = require('./matrix').getPerimeterPositions;
+var getThreatCountByPosition = require('./matrix').getThreatCountByPosition;
+var sweepByPosition = require('./matrix').sweepByPosition;
+
 describe('game board with set number of mines', function() {
   it('should return a shuffled array of 81 tiles for a 9x9 board', function() {
     var tiles = generateTiles(buildTile, 16, 16, 40);
@@ -19,56 +23,56 @@ describe('game board with set number of mines', function() {
 describe('getPerimeter', function() {
   it('should return 3 neighboring tiles for nw corner tile', function() {
     var tiles = generateTiles(buildTile);
-    var nwPerimeter = getPerimeter(0, tiles, 9);
+    var nwPerimeter = getPerimeterPositions(0, tiles, 9);
     expect(nwPerimeter.length).to.equal(3);
   });
 
   it('should return 3 neighboring tiles for ne corner tile', function() {
     var tiles = generateTiles(buildTile);
-    var nePerimeter = getPerimeter(8, tiles, 9);
+    var nePerimeter = getPerimeterPositions(8, tiles, 9);
     expect(nePerimeter.length).to.equal(3);
 
   });
 
   it('should return 3 neighboring tiles for sw corner tile', function() {
     var tiles = generateTiles(buildTile);
-    var swPerimeter = getPerimeter(72, tiles, 9);
+    var swPerimeter = getPerimeterPositions(72, tiles, 9);
     expect(swPerimeter.length).to.equal(3);
   });
 
   it('should return 3 neighboring tiles for se corner tile', function() {
     var tiles = generateTiles(buildTile);
-    var sePerimeter = getPerimeter(80, tiles, 9);
+    var sePerimeter = getPerimeterPositions(80, tiles, 9);
     expect(sePerimeter.length).to.equal(3);
   });
 
   it('should return 5 neighboring tiles for any non-corner western edge tile', function() {
     var tiles = generateTiles(buildTile);
-    var sePerimeter = getPerimeter(18, tiles, 9);
+    var sePerimeter = getPerimeterPositions(18, tiles, 9);
     expect(sePerimeter.length).to.equal(5);
   });
 
   it('should return 5 neighboring tiles for any non-corner eastern edge tile', function() {
     var tiles = generateTiles(buildTile);
-    var sePerimeter = getPerimeter(71, tiles, 9);
+    var sePerimeter = getPerimeterPositions(71, tiles, 9);
     expect(sePerimeter.length).to.equal(5);
   });
 
   it('should return 5 neighboring tiles for any non-corner northern edge tile', function() {
     var tiles = generateTiles(buildTile);
-    var sePerimeter = getPerimeter(4, tiles, 9);
+    var sePerimeter = getPerimeterPositions(4, tiles, 9);
     expect(sePerimeter.length).to.equal(5);
   });
 
   it('should return 5 neighboring tiles for any non-corner southern edge tile', function() {
     var tiles = generateTiles(buildTile);
-    var sePerimeter = getPerimeter(75, tiles, 9);
+    var sePerimeter = getPerimeterPositions(75, tiles, 9);
     expect(sePerimeter.length).to.equal(5);
   });
 
   it('should return 8 neighboring tiles for any non-edge tile', function() {
     var tiles = generateTiles(buildTile);
-    var sePerimeter = getPerimeter(23, tiles, 9);
+    var sePerimeter = getPerimeterPositions(23, tiles, 9);
     expect(sePerimeter.length).to.equal(8);
   });
 });
@@ -99,13 +103,29 @@ describe('isSafe', function() {
     ]
     expect(isSafe(tiles)).to.be.false;
   });
+
+  it('should return false when a tile with a mine has been swept (9x9)', function() {
+    var tiles = [
+      {hasMine: true,  swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: true,  swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0},
+      {hasMine: false, swept: false, threatCount: 2}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0},
+      {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1},
+      {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 0},
+      {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: false, swept: false, threatCount: 2},
+      {hasMine: true,  swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 0},
+      {hasMine: true,  swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 2}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1},
+      {hasMine: false, swept: false, threatCount: 3}, {hasMine: false, swept: false, threatCount: 3}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0},
+      {hasMine: true,  swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}
+    ];
+
+    expect(isSafe(sweepByPosition(32, tiles, 9))).to.be.false;
+  });
 });
 
 describe('sweep', function() {
   it('should return a new arry of tiles after recursively sweeping perimeters', function() {
     var tiles = generateTiles(buildTile);
     tiles[40] = Object.assign({}, tiles[40], { swept: true });
-    var updatedBoard = sweep(40, tiles, 9);
+    var updatedBoard = sweepByPosition(40, tiles, 9);
     expect(updatedBoard.length).to.equal(81);
   });
 
@@ -127,7 +147,7 @@ describe('sweep', function() {
     ];
     var expectedRevealed = sweptTiles.filter( function(tile) { return tile.swept }).length;
 
-    var updatedBoard = sweep(12, tiles, 5);
+    var updatedBoard = sweepByPosition(12, tiles, 5);
     var actualRevealed = updatedBoard.filter( function(tile) { return tile.swept }).length;
 
     expect(actualRevealed).to.equal(expectedRevealed);
@@ -160,7 +180,7 @@ describe('sweep', function() {
     var expectedRevealed = sweptTiles.filter( function(tile) { return tile.swept }).length;
 
 
-    var updatedBoard = sweep(29, tiles, 9);
+    var updatedBoard = sweepByPosition(29, tiles, 9);
     var actualRevealed = updatedBoard.filter( function(tile) { return tile.swept }).length;
 
     expect(actualRevealed).to.equal(expectedRevealed);
