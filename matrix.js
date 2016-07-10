@@ -71,15 +71,15 @@ const getThreatCount = perimeter =>
   }, 0)
 
 const sweep = (tileIndex, tiles, cols) => {
-  const tile = tiles[tileIndex]
-  if (tile.hasMine) return tiles;
-  const sweptTile = Object.assign({}, tile, { swept: true })
+  const currentTile = tiles[tileIndex]
+  const sweptTile = Object.assign({}, currentTile, { swept: true })
   const updatedBoard = tiles.map( (tile, index) =>
     index === tileIndex ? sweptTile : tile
   )
+  if (currentTile.hasMine || currentTile.threatCount > 0) return updatedBoard;
   const perimeter = getPerimeter(tileIndex, updatedBoard, cols);
   const sweptBoard = perimeter.reduce( (board, tile) => {
-    return !tile.swept && tile.threatCount === 0 ?
+    return !tile.swept ?
       sweep(tile.key, board, cols) :
       board
     }, updatedBoard)

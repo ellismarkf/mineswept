@@ -108,10 +108,41 @@ describe('sweep', function() {
     var updatedBoard = sweep(40, tiles, 9);
     expect(updatedBoard.length).to.equal(81);
   });
+
+  it('should recursively sweep perimeters correctly', function() {
+    var tiles = [
+      {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0},
+      {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1},
+      {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: true,  swept: false, threatCount: 0},
+      {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 1}, {hasMine: false, swept: false, threatCount: 1},
+      {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}, {hasMine: false, swept: false, threatCount: 0}
+    ];
+
+    var sweptTiles = [
+      {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0},
+      {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: true,  threatCount: 1},
+      {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: true,  swept: false, threatCount: 0},
+      {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 1}, {hasMine: false, swept: true,  threatCount: 1},
+      {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}, {hasMine: false, swept: true,  threatCount: 0}
+    ];
+
+    var testResult = [
+
+    ];
+
+    var expectedRevealed = sweptTiles.filter( function(tile) { return tile.swept }).length;
+
+    var updatedBoard = sweep(12, tiles, 5);
+    console.log(updatedBoard)
+
+    var actualRevealed = updatedBoard.filter( function(tile) { return tile.swept }).length;
+
+    expect(actualRevealed).to.equal(expectedRevealed);
+  });
 });
 
 describe('reveal', function(){
-  it('should return a new array of tiles with the given tile\'s swept property set to true', function() {
+  xit('should return a new array of tiles with the given tile\'s swept property set to true', function() {
     var tiles = generateTiles(buildTile);
     var updatedBoard = reveal(40, tiles, 9);
     var sweptTile = updatedBoard[40];
