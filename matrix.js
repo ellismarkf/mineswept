@@ -11,9 +11,9 @@ const generateTiles = (tile, rows = 9, cols = 9, mines = 10) =>
   .concat([...Array(rows * cols - mines)].map( t => tile()))
   .sort(() => Math.random() - 0.5)
   .map( (tile, index, tiles) => {
-    const perimeter = getPerimeterPositions(index, tiles, cols)
+    const perimeter = getPerimeter(index, tiles, cols)
     return Object.assign({}, tile, {
-      threatCount: getThreatCountByPosition(perimeter, tiles)
+      threatCount: getThreatCount(perimeter, tiles)
     })
   })
 
@@ -39,7 +39,7 @@ const perimeterCoords = (tileIndex, cols) =>
     'NE': tileIndex - (cols - 1)  
   })
 
-const getPerimeterPositions = (tileIndex, tiles, cols) => {
+const getPerimeter = (tileIndex, tiles, cols) => {
   const perimeter = perimeterCoords(tileIndex, cols)
   return directions
     .map( direction => {
@@ -61,24 +61,24 @@ const checkEastPerimeter = (t, c, pI) =>
   (t + 1) % c === 0 &&
     (pI === (t + 1) || pI === (t - (c - 1)) || pI === (t + (c + 1)))
 
-const getThreatCountByPosition = (perimeter, tiles) =>
+const getThreatCount = (perimeter, tiles) =>
   perimeter.reduce((threats, pos) => {
     const tile = tiles[pos]
     return tile.hasMine ? threats += 1 : threats
   }, 0)
 
-const sweepByPosition = (tileIndex, tiles, cols) => {
+const sweep = (tileIndex, tiles, cols) => {
   const currentTile = tiles[tileIndex]
   const sweptTile = Object.assign({}, currentTile, { swept: true })
   const updatedBoard = tiles.map( (tile, index) =>
     index === tileIndex ? sweptTile : tile
   )
   if (currentTile.hasMine || currentTile.threatCount > 0) return updatedBoard;
-  const perimeter = getPerimeterPositions(tileIndex, updatedBoard, cols);
+  const perimeter = getPerimeter(tileIndex, updatedBoard, cols);
   const sweptBoard = perimeter.reduce( (board, pos) => {
     const tile = board[pos]
     return !tile.swept ?
-      sweepByPosition(pos, board, cols) :
+      sweep(pos, board, cols) :
       board
     }, updatedBoard)
 
@@ -94,13 +94,9 @@ module.exports = {
   generateTiles,
   buildTile,
   getPerimeter,
-  getPerimeterPositions,
   perimeterCoords,
   getThreatCount,
-  getThreatCountByPosition,
   sweep,
-  sweepByPosition,
-  reveal,
   isSafe,
   directions
 }
