@@ -1,8 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { update } from '../state'
+import { reveal, revealMines } from '../state'
 import { generateTiles, sweep, isSafe } from '../minesweeper'
+import { tileStyle, sweptTileStyle, hasMineStyle } from '../styles'
 
+/* GAME */
 class Minesweeper extends React.Component {
   render() {
     return (
@@ -13,38 +15,60 @@ class Minesweeper extends React.Component {
     )
   }
 }
+export default Minesweeper
 
-const Board = ({tiles, cols}) => (
-  <div style={{ width: `${cols * 20}px`, margin: `0 auto` }}>
-    {tiles.map( (tile, index) => (
-      <Tile {...tile} key={index} pos={index}/>
-    ))}
-  </div>
-)
+
+/* BOARD */
+const Board = ({tiles, cols, safe, revealMines}) => {
+  console.log('rerendering')
+  // if (!safe) revealMines()
+  return (
+    <div style={{ width: `${cols * 20}px`, margin: `0 auto`, overflow: 'hidden' }}>
+      {tiles.map( (tile, index, tiles) => (
+        <ConnectedTile {...tile} key={index} pos={index}/>
+      ))}
+    </div>
+  )
+}
 
 const mapBoardStateToProps = (state) => ({
   tiles: state.minesweeper.tiles,
-  cols: state.minesweeper.cols
+  cols: state.minesweeper.cols,
+  safe: isSafe(state.minesweeper.tiles)
 })
 
-const ConnectedBoard = connect(mapBoardStateToProps)(Board)
+const mapBoardDispatchToProps = (dispatch) => ({
+  revealMines: () => dispatch(revealMines()),
+  endGame: () => dispatch()
+})
 
-const tileStyle = {
-  display: 'inline-block',
-  width: `${20}px`,
-  height: `${20}px`,
-  marginBottom: `${-5}px`,
-  boxSizing: 'border-box',
-  border: `1px solid #BBB`,
-  backgroundColor: '#CCC'
+const ConnectedBoard = connect(
+  mapBoardStateToProps,
+  mapBoardDispatchToProps
+)(Board)
+
+
+/* TILE */
+const calculateStyle = (swept, hasMine) => {
+  if (!swept) return tileStyle
+  if (swept && !hasMine) return sweptTileStyle
+  if (swept && hasMine) return hasMineStyle
 }
 
-const hasMineStyle = Object.assign({}, tileStyle, {
-  backgroundColor: 'red'
-})
-
-const Tile = ({ hasMine, swept, threatCount, pos }) => (
-    <span style={hasMine ? hasMineStyle : tileStyle}></span>
+const Tile = ({ hasMine, swept, threatCount, pos, reveal, tiles, cols }) => (
+    <div
+      style={calculateStyle(swept, hasMine)}
+      onClick={() => reveal(pos)}>
+      {!swept && ''}
+      {swept && hasMine ? '💣' : ''}
+      {swept && !hasMine && threatCount > 0 ? threatCount : ''}
+    </div>
 )
 
-export default Minesweeper
+// const mapTileStateToProps
+
+const mapDispatchToProps = (dispatch) => ({
+  reveal: (pos) => dispatch(reveal(pos))
+})
+
+const ConnectedTile = connect(undefined, mapDispatchToProps)(Tile)

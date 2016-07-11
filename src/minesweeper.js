@@ -90,6 +90,11 @@ const isSafe = tiles =>
     return safe && (!tile.swept  || tile.swept && !tile.hasMine)
   }, true)
 
+const revealMinePositions = tiles =>
+  tiles.map( tile =>
+    tile.hasMine ? Object.assign({}, tile, { swept: true }) : tile
+  )
+
 module.exports = {
   newBoard,
   generateTiles,
@@ -99,5 +104,6 @@ module.exports = {
   getThreatCount,
   sweep,
   isSafe,
+  revealMinePositions,
   directions
 }
