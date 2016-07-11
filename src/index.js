@@ -1,11 +1,14 @@
 import React from 'react'
 import { render } from 'react-dom'
+import { Provider } from 'react-redux'
+import { configureStore } from './state'
 import Minesweeper from './components/Minesweeper'
 import { newBoard, buildTile, sweep, isSafe } from './minesweeper'
-
-const game = newBoard(buildTile)
+const store = configureStore()
 
 render(
-  <Minesweeper game={game}/>,
+  <Provider store={store}>
+    <Minesweeper />
+  </Provider>,
   document.getElementById('root')
 )

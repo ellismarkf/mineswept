@@ -1,32 +1,33 @@
 import React from 'react'
+import { connect } from 'react-redux'
+import { update } from '../state'
 import { generateTiles, sweep, isSafe } from '../minesweeper'
-
-// const Minesweeper = ({ game }) => (
-//     <div>
-//         <h1>welcome to Minesweeper</h1>
-//         <Board {...game}/>
-//     </div>
-// )
 
 class Minesweeper extends React.Component {
   render() {
-    const { game } = this.props
     return (
       <div>
         <h1>welcome to Minesweeper</h1>
-        <Board {...game}/>
+        <ConnectedBoard />
       </div>
     )
   }
 }
 
-const Board = ({ tiles, cols, rows, mines }) => (
+const Board = ({tiles, cols}) => (
   <div style={{ width: `${cols * 20}px`, margin: `0 auto` }}>
     {tiles.map( (tile, index) => (
       <Tile {...tile} key={index} pos={index}/>
     ))}
   </div>
 )
+
+const mapBoardStateToProps = (state) => ({
+  tiles: state.minesweeper.tiles,
+  cols: state.minesweeper.cols
+})
+
+const ConnectedBoard = connect(mapBoardStateToProps)(Board)
 
 const tileStyle = {
   display: 'inline-block',
