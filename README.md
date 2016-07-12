@@ -43,6 +43,7 @@ Randomly filling the board with a given number of mines proved to be difficult u
 
 The game isn't completely finished yet.  Here are a few things I'm working on:
 
+- Enabling tile flagging.
 - Completing the UI.  (The game works right now, but the interface is incomplete, and there isn't any UI logic that prevents further clicking when the game is lost, etc.)
 - Using an Ordered Map as the underlying data structure, rather than an array. I haven't tested it, but using an Ordered Map means no iterating through an entire array when tiles update, since you can find the exact tile that changed and return a new object with only that key updated, using `Object.assign`.
 - Host the game online so people can play it!
