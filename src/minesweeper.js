@@ -11,6 +11,13 @@ const generateTiles = (tile, rows = 9, cols = 9, mines = 10) =>
   .concat([...Array(rows * cols - mines)].map( t => tile()))
   .sort(() => Math.random() - 0.5)
   .map( (tile, index, tiles) => {
+    /**
+     * Coordinates of tile in terms of index
+     * index => (row, col)
+     * 
+     * col = index % cols
+     * row = Math.floor((index - col) / rows)
+     */
     const perimeter = getPerimeter(index, tiles, cols)
     return Object.assign({}, tile, {
       threatCount: getThreatCount(perimeter, tiles)
