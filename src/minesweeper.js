@@ -14,7 +14,7 @@ const generateTiles = (tile, rows = 9, cols = 9, mines = 10) =>
     /**
      * Coordinates of tile in terms of index
      * index => (row, col)
-     * 
+     *
      * col = index % cols
      * row = Math.floor((index - col) / rows)
      */
@@ -24,6 +24,13 @@ const generateTiles = (tile, rows = 9, cols = 9, mines = 10) =>
     })
   })
 
+const hasMine = 1 << 0,
+      swept   = 1 << 1,
+      flagged = 1 << 2
+
+const newBuildTile = (state = 0, threatCount = 0) =>
+  new Uint8ClampedArray([state, threatCount])
+
 const buildTile = (hasMine = false, threatCount = 0) =>
   Object.assign({}, {
     hasMine,
@@ -32,18 +39,37 @@ const buildTile = (hasMine = false, threatCount = 0) =>
     threatCount
   })
 
-const directions = [ 'N', 'NW', 'W', 'SW', 'S', 'SE', 'E', 'NE' ]
+const perimeter = (tileIndex, cols) => new Set([
+  tileIndex - cols,
+  tileIndex - (cols + 1),
+  tileIndex - 1,
+  tileIndex + (cols - 1),
+  tileIndex + cols,
+  tileIndex + (cols + 1),
+  tileIndex + 1,
+  tileIndex - (cols - 1),
+])
 
-const perimeterCoords = (tileIndex, cols) =>
-  Object.assign({}, {
-    'N' : tileIndex - cols,
-    'NW': tileIndex - (cols + 1),
-    'W' : tileIndex - 1,
-    'SW': tileIndex + (cols - 1),
-    'S' : tileIndex + cols,
-    'SE': tileIndex + (cols + 1),
-    'E' : tileIndex + 1,
-    'NE': tileIndex - (cols - 1)  
+const directions = [ 'N', 'NW', 'W', 'SW', 'S', 'SE', 'E', 'NE' ]
+const perimeterCoords = (tileIndex, cols) => ({
+  'N' : tileIndex - cols,
+  'NW': tileIndex - (cols + 1),
+  'W' : tileIndex - 1,
+  'SW': tileIndex + (cols - 1),
+  'S' : tileIndex + cols,
+  'SE': tileIndex + (cols + 1),
+  'E' : tileIndex + 1,
+  'NE': tileIndex - (cols - 1)
+})
+
+const getP = (tileIndex, tileCount, cols) =>
+  new Int8Array([...perimeter(tileIndex, cols)])
+  .filter( pos => {
+    const invalidW = checkWestPerimeter(tileIndex, cols, pos)
+    const invalidE = checkEastPerimeter(tileIndex, cols, pos)
+    const invalidY = pos < 0 || pos >= tileCount
+
+    return !invalidW && !invalidE && !invalidY
   })
 
 const getPerimeter = (tileIndex, tiles, cols) => {
@@ -54,7 +80,7 @@ const getPerimeter = (tileIndex, tiles, cols) => {
       const invalidW = checkWestPerimeter(tileIndex, cols, pIndex)
       const invalidE = checkEastPerimeter(tileIndex, cols, pIndex)
       const invalidY = pIndex < 0 || pIndex >= tiles.length
-      
+
       return invalidW || invalidE || invalidY ? -1 : pIndex
     })
     .filter( pos => pos > -1 )

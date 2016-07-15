@@ -20,7 +20,6 @@ export default Minesweeper
 
 /* BOARD */
 const Board = ({tiles, cols, safe, revealMines}) => {
-  console.log('rerendering')
   // if (!safe) revealMines()
   return (
     <div style={{ width: `${cols * 20}px`, margin: `0 auto`, overflow: 'hidden' }}>
@@ -56,14 +55,15 @@ const calculateStyle = (swept, hasMine) => {
 }
 
 const Tile = ({ hasMine, swept, threatCount, pos, reveal, tiles, cols }) => (
-    <div
-      style={calculateStyle(swept, hasMine)}
-      onClick={() => reveal(pos)}>
-      {!swept && ''}
-      {swept && hasMine ? '💣' : ''}
-      {swept && !hasMine && threatCount > 0 ? threatCount : ''}
-    </div>
+  <div
+    style={calculateStyle(swept, hasMine)}
+    onClick={() => reveal(pos)}>
+    {!swept && ''}
+    {swept && hasMine ? '💣' : ''}
+    {swept && !hasMine && threatCount > 0 ? threatCount : ''}
+  </div>
 )
+
 
 // const mapTileStateToProps
 

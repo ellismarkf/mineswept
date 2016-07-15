@@ -19,7 +19,7 @@ export const revealMines = () => ({
 })
 
 export const endGame = () => ({
-  type: 'END_GAME'
+  type: 'LOSE_GAME'
 })
 
 /* REDUCERS */
@@ -31,13 +31,17 @@ const initialState = Object.assign({}, newBoard(buildTile), {
 const minesweeper = (state = initialState, action) => {
   switch (action.type) {
     case 'REVEAL_TILE':
+      const sweptBoard = sweep(action.tile, state.tiles, state.cols)
+      const safe = isSafe(sweptBoard)
       return Object.assign({}, state, {
-        tiles: sweep(action.tile, state.tiles, state.cols)
+        tiles: sweptBoard,
+        active: safe ? true : false
       })
     case 'REVEAL_MINES':
       return Object.assign({}, state, {
         tiles: revealMinePositions(state.tiles)
       })
+
     default:
       return state
   }
