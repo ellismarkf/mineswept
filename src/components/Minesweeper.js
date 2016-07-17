@@ -46,7 +46,6 @@ const ConnectedBoard = connect(mapBoardStateToProps)(Board)
 
 /* TILE */
 const calculateStyle = (state) => {
-  console.log(state)
   if (!(state & swept)) return tileStyle
   if (state & swept && !(state & hasMine)) return sweptTileStyle
   if (state & swept && state & hasMine) return hasMineStyle
