@@ -1,11 +1,15 @@
 import { combineReducers, createStore } from 'redux'
 import thunk from 'redux-thunk'
 import {
-  newBoard,
-  buildTile,
+  board,
   sweep,
-  isSafe,
-  revealMinePositions } from './minesweeper'
+  safe,
+  revealMines,
+  playing,
+  editing,
+  active,
+  won,
+  lost } from './minesweeper'
 
 /* ACTIONS */
 
@@ -14,9 +18,9 @@ export const reveal = (tile) => ({
   tile
 })
 
-export const revealMines = () => ({
-  type: 'REVEAL_MINES'
-})
+// export const revealMines = () => ({
+//   type: 'REVEAL_MINES'
+// })
 
 export const endGame = () => ({
   type: 'LOSE_GAME'
@@ -24,18 +28,13 @@ export const endGame = () => ({
 
 /* REDUCERS */
 
-const initialState = Object.assign({}, newBoard(buildTile), {
-  active: false
-})
+const initialState = board()
 
 const minesweeper = (state = initialState, action) => {
   switch (action.type) {
     case 'REVEAL_TILE':
-      const sweptBoard = sweep(action.tile, state.tiles, state.cols)
-      const safe = isSafe(sweptBoard)
       return Object.assign({}, state, {
-        tiles: sweptBoard,
-        active: safe ? true : false
+        tiles: sweep(action.tile, state.tiles, state.threats, state.cols),
       })
     case 'REVEAL_MINES':
       return Object.assign({}, state, {
