@@ -31,9 +31,9 @@ const hasMine = 1 << 0,
       swept   = 1 << 1,
       flagged = 1 << 2
 
-const playing = 1 << 0,
+const active  = 1 << 0,
       editing = 1 << 1,
-      active  = 1 << 2,
+      playing = 1 << 2,
       won     = 1 << 3,
       lost    = 1 << 4
 
