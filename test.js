@@ -182,3 +182,5 @@ describe('sweep', function() {
   });
 
 });
+
+// 30.4 ms
