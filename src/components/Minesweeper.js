@@ -1,11 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { reveal, revealMines } from '../state'
-import { sweep, safe, hasMine, swept } from '../minesweeper'
+import { reveal, revealMines, setToPlayMode } from '../state'
+import { sweep, safe, hasMine, swept, playing,
+         editing, active, won, lost } from '../minesweeper'
 import { tileStyle, sweptTileStyle, hasMineStyle } from '../styles'
 
 /* GAME */
 class Minesweeper extends React.Component {
+  componentDidMount() {
+    this.props.setMode()
+  }
   render() {
     return (
       <div>
@@ -15,6 +19,12 @@ class Minesweeper extends React.Component {
     )
   }
 }
+
+const mapDispatchToContainer = (dispatch) => ({
+  setMode: () => dispatch(setToPlayMode())
+})
+
+const ConnectedContainer = connect(undefined, mapDispatchToContainer)(Minesweeper)
 export default Minesweeper
 
 

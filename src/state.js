@@ -14,8 +14,16 @@ import {
 /* ACTIONS */
 
 export const reveal = (tile) => ({
-  type: 'REVEAL_TILE',
+  type: 'TILE_REVEALED',
   tile
+})
+
+export const setToPlayMode = () => ({
+  type: 'MODE_SET_TO_PLAY'
+})
+
+export const activateGame = () => ({
+  type: 'GAME_ACTIVATED'
 })
 
 // export const revealMines = () => ({
@@ -31,16 +39,24 @@ export const endGame = () => ({
 const initialState = board()
 
 const minesweeper = (state = initialState, action) => {
+  const { rows, cols, mines, tiles, threats, mode } = state
   switch (action.type) {
-    case 'REVEAL_TILE':
+    case 'TILE_REVEALED':
+      const sweptBoard = sweep(action.tile, tiles, threats, cols)
+      const isSafe = safe(sweptBoard)
+      const isActive = mode & (playing | active)
       return Object.assign({}, state, {
-        tiles: sweep(action.tile, state.tiles, state.threats, state.cols),
-      })
-    case 'REVEAL_MINES':
-      return Object.assign({}, state, {
-        tiles: revealMinePositions(state.tiles)
-      })
+        tiles: sweptBoard,
 
+      })
+    case 'MODE_SET_TO_PLAY':
+      return Object.assign({}, state, {
+        mode: mode | playing
+      })
+    case 'GAME_ACTIVATED':
+      return Object.assign({}, state, {
+        mode: mode | active
+      })
     default:
       return state
   }

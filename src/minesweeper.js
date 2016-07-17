@@ -6,7 +6,7 @@ const board = (rows = 9, cols = 9, mines = 10) => {
     mines,
     tiles: t,
     threats: markThreatCounts(t, cols),
-    state: 0
+    mode: 0
   }
 }
 
