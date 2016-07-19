@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { reveal, revealMines, setToPlayMode } from '../state'
-import { sweep, safe, hasMine, swept, playing,
-         editing, active, won, lost } from '../minesweeper'
-import { tileStyle, sweptTileStyle, hasMineStyle } from '../styles'
+import { hasMine, swept, flagged,
+         playing, editing, active, won, lost } from '../minesweeper'
+// import { tileStyle, sweptTileStyle, hasMineStyle } from '../styles'
 
 /* GAME */
 class Minesweeper extends React.Component {
@@ -20,12 +20,12 @@ class Minesweeper extends React.Component {
   }
 }
 
-const mapDispatchToContainer = (dispatch) => ({
+const mapDispatchToRoot = (dispatch) => ({
   setMode: () => dispatch(setToPlayMode())
 })
 
-const ConnectedContainer = connect(undefined, mapDispatchToContainer)(Minesweeper)
-export default ConnectedContainer
+const ConnectedRoot = connect(undefined, mapDispatchToRoot)(Minesweeper)
+export default ConnectedRoot
 
 
 /* BOARD */
@@ -63,29 +63,29 @@ const calculateStyle = (state) => {
 
 const tileContent = {
   0: '',
+  1: '',
   2: '',
-  3: '💣'
+  3: '💣',
+  4: '🚩'
+}
+
+const tileStyle = {
+  0: 'tile',
+  1: 'tile',
+  2: 'swept-tile',
+  3: 'swept-mine'
 }
 
 const content = (tile, threats) =>
   tile === 2 && threats > 0 ? threats : tileContent[tile]
 
-const Tile = ({ tile, threats, pos, reveal }) => {
-  console.log(tile & ~swept & hasMine);
-  return (
+const Tile = ({ tile, threats, pos, reveal }) => (
   <div
-    style={calculateStyle(tile)}
+    className={tileStyle[tile]}
     onClick={() => reveal(pos)}>
     {content(tile, threats)}
   </div>
 )
-}
-    // {!(tile & swept) && ''}
-    // {tile & ~swept & hasMine ? '💣' : ''}
-    // {tile & swept & ~hasMine && threats > 0 ? threats : ''}
-
-
-// const mapTileStateToProps
 
 const mapDispatchToProps = (dispatch) => ({
   reveal: (pos) => dispatch(reveal(pos))
