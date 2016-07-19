@@ -55,12 +55,6 @@ const ConnectedBoard = connect(mapBoardStateToProps)(Board)
 
 
 /* TILE */
-const calculateStyle = (state) => {
-  if (!(state & swept)) return tileStyle
-  if (state & swept && !(state & hasMine)) return sweptTileStyle
-  if (state & swept | hasMine) return hasMineStyle
-}
-
 const tileContent = {
   0: '',
   1: '',
