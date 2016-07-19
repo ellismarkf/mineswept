@@ -25,7 +25,7 @@ const mapDispatchToContainer = (dispatch) => ({
 })
 
 const ConnectedContainer = connect(undefined, mapDispatchToContainer)(Minesweeper)
-export default Minesweeper
+export default ConnectedContainer
 
 
 /* BOARD */
@@ -58,20 +58,31 @@ const ConnectedBoard = connect(mapBoardStateToProps)(Board)
 const calculateStyle = (state) => {
   if (!(state & swept)) return tileStyle
   if (state & swept && !(state & hasMine)) return sweptTileStyle
-  if (state & swept && state & hasMine) return hasMineStyle
+  if (state & swept | hasMine) return hasMineStyle
 }
 
+const tileContent = {
+  0: '',
+  2: '',
+  3: '💣'
+}
+
+const content = (tile, threats) =>
+  tile === 2 && threats > 0 ? threats : tileContent[tile]
+
 const Tile = ({ tile, threats, pos, reveal }) => {
+  console.log(tile & ~swept & hasMine);
   return (
   <div
     style={calculateStyle(tile)}
     onClick={() => reveal(pos)}>
-    {!(tile & swept) && ''}
-    {tile & swept && tile & hasMine ? '💣' : ''}
-    {tile & swept && !(tile & hasMine) && threats > 0 ? threats : ''}
+    {content(tile, threats)}
   </div>
 )
 }
+    // {!(tile & swept) && ''}
+    // {tile & ~swept & hasMine ? '💣' : ''}
+    // {tile & swept & ~hasMine && threats > 0 ? threats : ''}
 
 
 // const mapTileStateToProps
