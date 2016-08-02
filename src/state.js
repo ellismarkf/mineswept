@@ -3,6 +3,7 @@ import thunk from 'redux-thunk'
 import {
   board,
   sweep,
+  s,
   safe,
   revealMines,
   playing,
@@ -26,23 +27,19 @@ export const activateGame = () => ({
   type: 'GAME_ACTIVATED'
 })
 
-// export const revealMines = () => ({
-//   type: 'REVEAL_MINES'
+// export const endGame = () => ({
+//   type: 'LOSE_GAME'
 // })
-
-export const endGame = () => ({
-  type: 'LOSE_GAME'
-})
 
 /* REDUCERS */
 
-const initialState = board()
+const initialState = board(50, 50, 40)
 
 const minesweeper = (state = initialState, action) => {
-  const { rows, cols, mines, tiles, threats, mode } = state
+  const { rows, cols, mines, tiles, threats, mode, game } = state
   switch (action.type) {
     case 'TILE_REVEALED':
-      const sweptBoard = sweep(action.tile, tiles, threats, cols)
+      const sweptBoard = s(action.tile, tiles, threats, cols)
       const isSafe = safe(sweptBoard)
       const isActive = mode & (playing | active)
       return Object.assign({}, state, {
@@ -55,7 +52,7 @@ const minesweeper = (state = initialState, action) => {
       })
     case 'GAME_ACTIVATED':
       return Object.assign({}, state, {
-        mode: mode | active
+        game: game | active
       })
     default:
       return state
@@ -68,4 +65,4 @@ const reducers = combineReducers({ minesweeper })
 /* STORE */
 
 export const configureStore = initialState =>
-  createStore(reducers, initialState)
+  createStore(reducers, initialState, window.devToolsExtension && window.devToolsExtension())

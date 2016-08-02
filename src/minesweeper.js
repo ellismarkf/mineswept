@@ -1,12 +1,16 @@
+"use strict";
+
 const board = (rows = 9, cols = 9, mines = 10) => {
   const t = addMines(tiles(rows, cols), mines)
   return {
     rows,
     cols,
     mines,
+    remainingMines: mines,
     tiles: t,
     threats: markThreatCounts(t, cols),
-    mode: 0
+    mode: 0,
+    game: 0
   }
 }
 
@@ -31,11 +35,12 @@ const hasMine = 1 << 0,
       swept   = 1 << 1,
       flagged = 1 << 2
 
+const playing = 1 << 0,
+      editing = 1 << 1
+
 const active  = 1 << 0,
-      editing = 1 << 1,
-      playing = 1 << 2,
-      won     = 1 << 3,
-      lost    = 1 << 4
+      won     = 1 << 1,
+      lost    = 1 << 2
 
 const perimeter = (tileIndex, cols) => new Set([
   tileIndex - cols,
@@ -49,7 +54,7 @@ const perimeter = (tileIndex, cols) => new Set([
 ])
 
 const getPerimeter = (tileIndex, tileCount, cols) =>
-  new Int8Array([...perimeter(tileIndex, cols)])
+  new Int16Array([...perimeter(tileIndex, cols)])
   .filter( pos => {
     const invalidW = checkWest(tileIndex, cols, pos)
     const invalidE = checkEast(tileIndex, cols, pos)
@@ -71,6 +76,22 @@ const checkEast = (t, c, pI) =>
   (t + 1) % c === 0 &&
     (pI === (t + 1) || pI === (t - (c - 1)) || pI === (t + (c + 1)))
 
+const tco = fn => {
+  let queue;
+  return function() {
+    let args, result;
+    if (queue) {
+      queue.push(arguments);
+    } else {
+      queue = [arguments];
+      while ((args = queue.pop())) {
+        result = fn.apply(this, args);
+      }
+      queue = null;
+    }
+    return result;
+  };
+}
 
 const sweep = (pos, tiles, threats, cols) => {
   const currentTile = tiles[pos]
@@ -81,11 +102,30 @@ const sweep = (pos, tiles, threats, cols) => {
   )
   if ((currentTile & hasMine) || (threatCount > 0)) return updatedBoard
   const perimeter = getPerimeter(pos, updatedBoard.length, cols)
-  const sweptBoard = perimeter.reduce((board, pPos) =>
+
+  return perimeter.reduce((board, pPos) =>
     !(board[pPos] & swept) ? sweep(pPos, board, threats, cols) : board
   , updatedBoard)
+}
 
-  return sweptBoard
+const s = (pos, tiles, threats, cols) => {
+  const _recur = (tls, queue) => {
+    if (queue.length === 0) return tls
+    const [pos, rest] = [queue[0], queue.slice(1)]
+    const currentTile = tls[pos]
+    const threatCount = threats[pos]
+    const sweptTile = currentTile | swept
+    const updatedBoard = tls.map((tile, i) =>
+      i === pos ? sweptTile : tile
+    )
+    if ((currentTile & hasMine) || (threatCount > 0)) return _recur(updatedBoard, rest)
+    const perimeter = getPerimeter(pos, updatedBoard.length, cols)
+      .filter(p => updatedBoard[p] === 0)
+    const newQueue = new Int16Array([...perimeter, ...rest])
+    return _recur(updatedBoard, newQueue)
+  }
+
+  return _recur(tiles, [pos])
 }
 
 const safe = tiles =>
@@ -97,7 +137,6 @@ const revealMines = tiles =>
   tiles.map( tile =>
     tile & hasMine ? tile | swept : tile
   )
-
 
 module.exports = {
   board,
@@ -111,6 +150,7 @@ module.exports = {
   checkWest,
   checkEast,
   sweep,
+  s,
   safe,
   revealMines,
   hasMine,
@@ -120,5 +160,5 @@ module.exports = {
   editing,
   active,
   won,
-  lost  
+  lost
 }

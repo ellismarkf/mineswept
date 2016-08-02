@@ -13,7 +13,7 @@ class Minesweeper extends React.Component {
   render() {
     return (
       <div>
-        <h1>welcome to Minesweeper</h1>
+        <h1>Minesweeper</h1>
         <ConnectedBoard />
       </div>
     )
@@ -30,7 +30,7 @@ export default ConnectedRoot
 
 /* BOARD */
 const Board = ({tiles, threats, cols}) => (
-  <div style={{ width: `${cols * 20}px`, margin: `0 auto`, overflow: 'hidden' }}>
+  <div style={{ width: `${cols * 20}px`}} className='board'>
     {tiles.reduce(
       (children, tile, index, tiles) =>
         children.concat(
@@ -48,7 +48,9 @@ const Board = ({tiles, threats, cols}) => (
 const mapBoardStateToProps = (state) => ({
   tiles: state.minesweeper.tiles,
   threats: state.minesweeper.threats,
-  cols: state.minesweeper.cols
+  remainingMines: state.minesweeper.remainingMines,
+  cols: state.minesweeper.cols,
+  game: state.minesweeper.game
 })
 
 const ConnectedBoard = connect(mapBoardStateToProps)(Board)
@@ -77,7 +79,7 @@ const Tile = ({ tile, threats, pos, reveal }) => (
   <div
     className={tileStyle[tile]}
     onClick={() => reveal(pos)}>
-    {content(tile, threats)}
+    <span>{content(tile, threats)}</span>
   </div>
 )
 
